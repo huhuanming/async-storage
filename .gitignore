@@ -64,3 +64,4 @@ buck-out/
 
 # builds by bob
 lib/
+.history
