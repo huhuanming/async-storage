@@ -1,6 +1,7 @@
 import { TurboModuleRegistry, TurboModule } from 'react-native';
 
 export interface Spec extends TurboModule {
+  getValueForKey: (key: string) => string;
   multiGet: (
     keys: string[],
     callback: (error?: Object[], result?: [string, string][]) => void
