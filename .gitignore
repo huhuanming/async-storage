@@ -63,5 +63,4 @@ buck-out/
 /web-build
 
 # builds by bob
-lib/
 .history
