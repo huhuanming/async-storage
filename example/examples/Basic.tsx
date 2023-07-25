@@ -156,7 +156,10 @@ function NextExample() {
                 NativeModules.PlatformLocalStorage ||
                 NativeModules.RNC_AsyncSQLiteDBStorage ||
                 NativeModules.RNCAsyncStorage;
-              alert(JSON.parse(RCTAsyncStorage.getValueForKey(inputKey)));
+              const value = RCTAsyncStorage.getValueForKey(inputKey);
+              if (value) {
+                alert(JSON.parse(RCTAsyncStorage.getValueForKey(inputKey)));
+              }
             }}
           />
         </View>

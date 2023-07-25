@@ -39,7 +39,14 @@ class StorageModule(reactContext: ReactApplicationContext) : NativeAsyncStorageM
             return StorageSupplier.getInstance(ctx)
         }
     }
-
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    override fun getValueForKey(key: String): String {
+        val entries = storage.getValue(key)
+        if (entries.size > 0) {
+            return entries[0].value ?: ""
+        }
+        return ""
+    }
     @ReactMethod
     override fun multiGet(keys: ReadableArray, cb: Callback) {
         launch(createExceptionHandler(cb)) {

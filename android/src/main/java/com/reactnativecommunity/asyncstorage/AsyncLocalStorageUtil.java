@@ -9,6 +9,7 @@ package com.reactnativecommunity.asyncstorage;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import android.content.ContentValues;
@@ -50,6 +51,14 @@ public class AsyncLocalStorageUtil {
     String[] selectionArgs = new String[count];
     for (int keyIndex = 0; keyIndex < count; keyIndex++) {
       selectionArgs[keyIndex] = keys.getString(start + keyIndex);
+    }
+    return selectionArgs;
+  }
+
+  /* package */ static String[] buildKeySelectionArgs(ArrayList<String> keys, int start, int count) {
+    String[] selectionArgs = new String[count];
+    for (int keyIndex = 0; keyIndex < count; keyIndex++) {
+      selectionArgs[keyIndex] = keys.get(start + keyIndex);
     }
     return selectionArgs;
   }

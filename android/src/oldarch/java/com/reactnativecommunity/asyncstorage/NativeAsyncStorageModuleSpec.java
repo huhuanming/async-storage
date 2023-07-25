@@ -21,6 +21,10 @@ public abstract class NativeAsyncStorageModuleSpec extends ReactContextBaseJavaM
     super(reactContext);
   }
 
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  @DoNotStrip
+  public abstract String getValueForKey(final String key);
+
   @ReactMethod
   @DoNotStrip
   public abstract void multiGet(ReadableArray keys, Callback callback);

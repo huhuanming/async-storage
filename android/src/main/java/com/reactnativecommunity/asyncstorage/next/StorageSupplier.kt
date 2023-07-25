@@ -32,7 +32,9 @@ data class Entry(
 
 @Dao
 internal interface StorageDao {
-
+    @Transaction
+    @Query("SELECT * FROM $TABLE_NAME WHERE `$COLUMN_KEY` = (:key)")
+    fun getValue(key: String): List<Entry>
     @Transaction
     @Query("SELECT * FROM $TABLE_NAME WHERE `$COLUMN_KEY` IN (:keys)")
     suspend fun getValues(keys: List<String>): List<Entry>
@@ -135,6 +137,7 @@ internal abstract class StorageDb : RoomDatabase() {
 }
 
 interface AsyncStorageAccess {
+    fun getValue(key: String): List<Entry>
     suspend fun getValues(keys: List<String>): List<Entry>
     suspend fun setValues(entries: List<Entry>)
     suspend fun removeValues(keys: List<String>)
@@ -151,7 +154,7 @@ class StorageSupplier internal constructor(db: StorageDb) : AsyncStorageAccess {
     }
 
     private val access = db.storage()
-
+    override fun getValue(key: String) = access.getValue(key)
     override suspend fun getValues(keys: List<String>) = access.getValues(keys)
     override suspend fun setValues(entries: List<Entry>) = access.setValues(entries)
     override suspend fun removeValues(keys: List<String>) = access.removeValues(keys)

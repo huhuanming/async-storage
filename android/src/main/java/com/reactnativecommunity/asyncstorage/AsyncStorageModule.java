@@ -28,6 +28,7 @@ import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.common.ModuleDataCleaner;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -103,6 +104,59 @@ public final class AsyncStorageModule
   public void onHostDestroy() {
     // ensure we close database when activity is destroyed
     mReactDatabaseSupplier.closeDatabase();
+  }
+
+@ReactMethod(isBlockingSynchronousMethod = true)
+  public String getValueForKey(final String key) {
+    if (key == null) {
+      return "";
+    }
+    String result = null;
+   if (!ensureDatabase()) {
+      return "";
+    }
+    ArrayList<String> keys = new ArrayList<String>();
+    keys.add("key");
+    String[] columns = {ReactDatabaseSupplier.KEY_COLUMN, ReactDatabaseSupplier.VALUE_COLUMN};
+    HashSet<String> keysRemaining = new HashSet<>();
+    WritableArray data = Arguments.createArray();
+    for (int keyStart = 0; keyStart < keys.size(); keyStart += MAX_SQL_KEYS) {
+      int keyCount = Math.min(keys.size() - keyStart, MAX_SQL_KEYS);
+      Cursor cursor = mReactDatabaseSupplier.get().query(
+          ReactDatabaseSupplier.TABLE_CATALYST,
+          columns,
+          AsyncLocalStorageUtil.buildKeySelection(keyCount),
+          AsyncLocalStorageUtil.buildKeySelectionArgs(keys, keyStart, keyCount),
+          null,
+          null,
+          null);
+      keysRemaining.clear();
+      try {
+        if (cursor.getCount() != keys.size()) {
+          // some keys have not been found - insert them with null into the final array
+          for (int keyIndex = keyStart; keyIndex < keyStart + keyCount; keyIndex++) {
+            keysRemaining.add(keys.get(keyIndex));
+          }
+        }
+
+        if (cursor.moveToFirst()) {
+          do {
+            WritableArray row = Arguments.createArray();
+            row.pushString(cursor.getString(0));
+            row.pushString(cursor.getString(1));
+            result = cursor.getString(1);
+            data.pushArray(row);
+            keysRemaining.remove(cursor.getString(0));
+          } while (cursor.moveToNext());
+        }
+      } catch (Exception e) {
+        FLog.w(ReactConstants.TAG, e.getMessage(), e);
+        return "";
+      } finally {
+        cursor.close();
+      }
+    }
+    return result;
   }
 
   /**
