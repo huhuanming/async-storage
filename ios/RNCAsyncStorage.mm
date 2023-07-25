@@ -666,6 +666,32 @@ RCT_EXPORT_MODULE()
 #pragma mark - Exported JS Functions
 
 // clang-format off
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getValueForKey:(NSString *)key)
+// clang-format on
+{
+    if (self.delegate != nil) {
+        return [self.delegate valuesForKey:key];
+    }
+    NSString *filePath = [self _filePathForKey:key];
+    NSString *value = RCTReadFile(filePath, key, nil);
+    if (value == nil) {
+        value = [RCTGetCache() objectForKey:key];
+        if (!value) {
+            NSString *filePath = [self _filePathForKey:key];
+            value = RCTReadFile(filePath, key, nil);
+            if (value) {
+                [RCTGetCache() setObject:value forKey:key cost:value.length];
+            } else {
+                // file does not exist after all, so remove from manifest (no need to save
+                // manifest immediately though, as cost of checking again next time is negligible)
+                [_manifest removeObjectForKey:key];
+            }
+        }
+    }
+    return value;
+}
+
+// clang-format off
 RCT_EXPORT_METHOD(multiGet:(NSArray<NSString *> *)keys
                   callback:(RCTResponseSenderBlock)callback)
 // clang-format on

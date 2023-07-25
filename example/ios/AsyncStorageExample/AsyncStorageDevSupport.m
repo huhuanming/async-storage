@@ -108,6 +108,12 @@ static AsyncStorageDevSupport *_sharedInstance;
     completion(@[]);
 }
 
+
+- (NSString *)valuesForKey:(NSString *)key
+{
+    return _memoryStorage[key];
+}
+
 - (void)valuesForKeys:(NSArray<NSString *> *)keys
            completion:(RNCAsyncStorageResultCallback)completion
 {

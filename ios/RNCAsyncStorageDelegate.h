@@ -54,6 +54,8 @@ typedef void (^RNCAsyncStorageResultCallback)(NSArray<id<NSObject>> *valuesOrErr
           forKeys:(NSArray<NSString *> *)keys
        completion:(RNCAsyncStorageResultCallback)block;
 
+- (NSString *)valuesForKey:(NSString *)key;
+
 /*!
  * Returns values associated with specified keys.
  * @param keys Keys of values to return.

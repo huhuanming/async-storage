@@ -140,6 +140,28 @@ function NextExample() {
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <View style={styles.example}>
+        <Text style={styles.title}>Sync Read</Text>
+        <TextInput
+          onChangeText={setInputKey}
+          value={inputKey}
+          style={styles.input}
+          placeholder="key"
+        />
+        <View style={styles.row}>
+          <Button
+            title="Read"
+            onPress={() => {
+              const { NativeModules } = require('react-native');
+              const RCTAsyncStorage =
+                NativeModules.PlatformLocalStorage ||
+                NativeModules.RNC_AsyncSQLiteDBStorage ||
+                NativeModules.RNCAsyncStorage;
+              alert(JSON.parse(RCTAsyncStorage.getValueForKey(inputKey)));
+            }}
+          />
+        </View>
+      </View>
+      <View style={styles.example}>
         <Text style={styles.title}>Basic operations</Text>
         <TextInput
           onChangeText={setInputKey}
